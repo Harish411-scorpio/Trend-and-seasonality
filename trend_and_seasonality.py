@@ -15,9 +15,27 @@ df = pd.DataFrame({'Date': date_range, 'Value': data})
 df.set_index('Date', inplace=True)
 
 # Define trend component (m_t), seasonal component (s_t), and weight (w_k)
-m_t = np.linspace(10, 50, 100)  # Linear trend
-s_t = 10 * np.sin(np.linspace(0, 3 * np.pi, 100))  # Sinusoidal seasonality
-w_k = 1  # Weight (can be adjusted as needed)
+t = 20
+d = 16
+q = 8
+X_t = int(input("Enter a number:"))
+
+m_t = []
+s_t = []
+w_k = []
+
+for i in range(1, 101):
+    m_t_i = ((2*q-1)**-1)*X_t - i + np.random.normal(0, 2)  # Adding noise to trend
+    w_k_i = ((2*q-1)**-1)*X_t - i
+    s_t_i = 10 * np.sin(2 * np.pi * i / 12)  # Sinusoidal seasonal component
+    m_t.append(m_t_i)
+    s_t.append(s_t_i)
+    w_k.append(w_k_i)
+
+# Convert lists to numpy arrays
+m_t = np.array(m_t)
+s_t = np.array(s_t)
+w_k = np.array(w_k)
 
 # Calculate the result using the given components
 result = w_k * (m_t + s_t)
@@ -45,3 +63,5 @@ plt.legend(loc='upper left')
 
 plt.tight_layout()
 plt.show()
+
+
