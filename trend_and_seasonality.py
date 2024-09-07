@@ -25,7 +25,10 @@ s_t = []
 w_k = []
 
 for i in range(1, 101):
-    m_t_i = ((2*q-1)**-1)*X_t - i + np.random.normal(0, 2)  # Adding noise to trend
+    if i < 50:
+        m_t_i = 10 + 0.8 * i + np.random.normal(0, 2)  # Upward trend with noise
+    else:
+        m_t_i = 50 - 0.5 * (i - 50) + np.random.normal(0, 2)  # Downward trend with noise
     w_k_i = ((2*q-1)**-1)*X_t - i
     s_t_i = 10 * np.sin(2 * np.pi * i / 12)  # Sinusoidal seasonal component
     m_t.append(m_t_i)
@@ -63,5 +66,3 @@ plt.legend(loc='upper left')
 
 plt.tight_layout()
 plt.show()
-
-
