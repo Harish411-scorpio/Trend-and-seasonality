@@ -40,6 +40,7 @@ m_t = np.array(m_t)
 s_t = np.array(s_t)
 w_k = np.array(w_k)
 
+
 # Calculate the result using the given components
 result = w_k * (m_t + s_t)
 
