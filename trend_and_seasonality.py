@@ -1,83 +1,39 @@
 import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
 
-# Generate a sample time series data
-np.random.seed(0)
-date_range = pd.date_range(start='1/1/2020', periods=100, freq='M')
-trend = np.linspace(10, 50, 100)
-seasonal = 10 * np.sin(np.linspace(0, 3 * np.pi, 100))
-noise = np.random.normal(0, 2, 100)
-data = trend + seasonal + noise
+# Given time series data
+t = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29]
+X_t = [0, 4, 8, 7, 3, 1, 5, 8, 15, 13, 13, 10, 8, 12, 15, 18, 23, 20, 17, 15, 19, 22, 25, 29, 27, 24, 22, 26, 29]
 
-# Create a DataFrame
-df = pd.DataFrame({'Date': date_range, 'Value': data})
-df.set_index('Date', inplace=True)
-
-# Define trend component (m_t), seasonal component (s_t), and weight (w_k)
-t = 20
-d = 16
-q = 8
-X_t = int(input("Enter a number: "))
-
+# Calculate the trend component
+d = 8
+q = d // 2
 m_t = []
-s_t = []
+for i in range(len(X_t)):
+    sum = 0
+    for j in range(-q, q+1):
+        if 0 <= i+j < len(X_t):
+            sum += X_t[i+j]
+    m_t.append(sum / d)
+
+# Calculate the seasonal component
 w_k = []
+for k in range(q, len(X_t)-q):
+    sum = 0
+    for j in range(-q, q+1):
+        sum += X_t[k+j] - m_t[k+j]
+    w_k.append(sum / (2*q+1))
 
-for i in range(1, 101):
-    # Upward trend for the first half, downward trend for the second half
-    if i <= 50:
-        m_t_i = (0.5 * X_t - q + X_t - q + 1 + X_t + q - 1 + 0.5 * X_t + q) / d
-        m_t_i = 10 + 0.8 * i + np.random.normal(0, 2)  # Upward trend with some noise
-    else:
-        m_t_i = 50 - 0.8 * (i - 50) + np.random.normal(0, 2)  # Downward trend with some noise
-    
-    # Sinusoidal seasonal component
-    w_t_i = X_t - m_t_i
-    s_t_i = w_t_i - (w_t_i / d)
-    s_t_i = 10 * np.sin(2 * np.pi * i / 12)
-    
-    # Weight component based on the formula (X_t is a user input)
-    w_t_i = X_t - m_t_i
-    w_t_i = X_t - (m_t_i + s_t_i) / d
-    
-    # Append components to respective lists
-    m_t.append(m_t_i)
-    s_t.append(s_t_i)
-    w_k.append(w_t_i)
+# Repeat the seasonal component to match the length of the original data
+s_t = w_k * (len(X_t) // len(w_k)) + w_k[:len(X_t) % len(w_k)]
 
-# Convert lists to numpy arrays
-m_t = np.array(m_t)
-s_t = np.array(s_t)
-w_k = np.array(w_k)
+# Calculate the residual component
+res_t = [X_t[i] - m_t[i] - s_t[i] for i in range(len(X_t))]
 
-# Calculate the result using the given components
-result = w_k * (m_t + s_t)
-
-# Calculate residuals
-residual_component = df['Value'] - result
-
-# Plot the components
-plt.figure(figsize=(12, 8))
-plt.subplot(4, 1, 1)
-plt.plot(df['Value'], label='Original')
-plt.title('Original Time Series')
-plt.legend(loc='upper left')
-
-plt.subplot(4, 1, 2)
-plt.plot(df.index, m_t, label='Trend (m_t)', color='orange')
-plt.title('Trend Component (m_t)')
-plt.legend(loc='upper left')
-
-plt.subplot(4, 1, 3)
-plt.plot(df.index, s_t, label='Seasonal (s_t)', color='green')
-plt.title('Seasonal Component (s_t)')
-plt.legend(loc='upper left')
-
-plt.subplot(4, 1, 4)
-plt.plot(df.index, residual_component, label='Residual', color='red')
-plt.title('Residual Component')
-plt.legend(loc='upper left')
-
-plt.tight_layout()
+# Plot the original data, trend, seasonal, and residual components
+plt.figure(figsize=(10, 6))
+plt.plot(t, X_t, label='Original Data')
+plt.plot(t, m_t, label='Trend')
+plt.plot(t, s_t, label='Seasonal')
+plt.plot(t, res_t, label='Residual')
+plt.legend()
 plt.show()
