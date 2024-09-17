@@ -21,10 +21,15 @@ for k in range(q, len(X_t)-q):
     sum = 0
     for j in range(-q, q+1):
         sum += X_t[k+j] - m_t[k+j]
-    w_k.append(sum / (2*q+1))
-
-# Repeat the seasonal component to match the length of the original data
-s_t = w_k * (len(X_t) // len(w_k)) + w_k[:len(X_t) % len(w_k)]
+        w_k.append(sum / (2*q+1))
+        s_t = []
+for i in range(len(X_t)):
+    if i < q:
+        s_t.append(w_k[0])
+    elif i >= len(X_t) - q:
+            s_t.append(w_k[-1])
+    else:
+            s_t.append(w_k[i-q])
 
 # Calculate the residual component
 res_t = [X_t[i] - m_t[i] - s_t[i] for i in range(len(X_t))]
