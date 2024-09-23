@@ -9,27 +9,38 @@ d = 8
 q = d // 2
 m_t = []
 for i in range(len(X_t)):
-    sum = 0
+    m_t_i = 0
+    count = 0
     for j in range(-q, q+1):
         if 0 <= i+j < len(X_t):
-            sum += X_t[i+j]
-    m_t.append(sum / d)
+            m_t_i += X_t[i+j]
+            count += 1
+    m_t.append(m_t_i / count)
 
 # Calculate the seasonal component
 w_k = []
 for k in range(q, len(X_t)-q):
-    sum = 0
+    w_k_i = 0
+    count = 0
     for j in range(-q, q+1):
-        sum += X_t[k+j] - m_t[k+j]
-        w_k.append(sum / (2*q+1))
-        s_t = []
+        if q <= k+j*d < len(X_t)-q:
+            w_k_i += X_t[k+j*d] - m_t[k+j*d]
+            count += 1
+    w_k.append(w_k_i / count)
+
+# Calculate the average seasonal component
+avg_s = 0
+for i in range(len(w_k)):
+    avg_s += w_k[i]
+avg_s /= len(w_k)
+
+# Calculate the seasonal component
+s_t = []
 for i in range(len(X_t)):
-    if i < q:
-        s_t.append(w_k[0])
-    elif i >= len(X_t) - q:
-            s_t.append(w_k[-1])
+    if i < q or i >= len(X_t) - q:
+        s_t.append(0)
     else:
-            s_t.append(w_k[i-q])
+        s_t.append(w_k[(i-q) % len(w_k)] - avg_s)
 
 # Calculate the residual component
 res_t = [X_t[i] - m_t[i] - s_t[i] for i in range(len(X_t))]
