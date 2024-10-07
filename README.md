@@ -7,4 +7,4 @@ Before calculating the seasonal component find the average seasonal component fo
 In the code len stands for the length of the time series data.
 Before plotting these components mention the size of the figure which is to be plotted.
 Use the matplotlib to plot the trend, seasonal and residual components and generate the required results.
-Ensure that the plotting is done according the given data.
+Ensure that the plotting is done according to the given data.
